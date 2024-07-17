@@ -4,7 +4,6 @@ import google.generativeai as genai
 import os
 from IPython.display import display
 from IPython.display import Markdown
-from google.colab import userdata
 
 genimi_api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=genimi_api_key)
