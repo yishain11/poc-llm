@@ -1,5 +1,25 @@
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import transformers
+import torch
 
-pipe = pipeline("text-generation", model="tiiuae/falcon-180B")
-res = pipe("please generate a hard python question with 3 wrong answers and 1 correct one, with explenations for each")
-print('res: ', res)
+model = "tiiuae/falcon-7b"
+
+tokenizer = AutoTokenizer.from_pretrained(model)
+pipeline = transformers.pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer,
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+    device_map="auto",
+)
+sequences = pipeline(
+   "generate a hard python question with 3 wrong answers, 1 correct answer, and explanations for each",
+    max_length=200,
+    do_sample=True,
+    top_k=10,
+    num_return_sequences=1,
+    eos_token_id=tokenizer.eos_token_id,
+)
+for seq in sequences:
+    print(f"Result: {seq['generated_text']}")
