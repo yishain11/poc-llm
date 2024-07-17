@@ -1,17 +1,6 @@
-import pathlib
-import textwrap
-import google.generativeai as genai
-import os
-from IPython.display import display
-from IPython.display import Markdown
+# Use a pipeline as a high-level helper
+from transformers import pipeline
 
-genimi_api_key = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=genimi_api_key)
-model = genai.GenerativeModel('gemini-1.5-flash')
-response = model.generate_content("What is the meaning of life?")
-
-def to_markdown(text):
-  text = text.replace('•', '  *')
-  return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
-
-to_markdown(response.text)
+pipe = pipeline("text-generation", model="TheBloke/WizardLM-7B-uncensored-GPTQ")
+res = pipe("gemerate a python question with 3 wrong answer and 1 correct one, with explanations for each")
+print('res: ', res)
