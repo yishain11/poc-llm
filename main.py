@@ -1,25 +1,18 @@
-from transformers import AutoTokenizer, AutoModelForCausalLM
-import transformers
-import torch
+import pathlib
+import textwrap
+import google.generativeai as genai
+import os
+from IPython.display import display
+from IPython.display import Markdown
+from google.colab import userdata
 
-model = "distilgpt2"
+genimi_api_key = os.getenv("GEMINI_API_KEY")
+genai.configure(api_key=genimi_api_key)
+model = genai.GenerativeModel('gemini-1.5-flash')
+response = model.generate_content("What is the meaning of life?")
 
-tokenizer = AutoTokenizer.from_pretrained(model)
-pipeline = transformers.pipeline(
-    "text-generation",
-    model=model,
-    tokenizer=tokenizer,
-    torch_dtype=torch.bfloat16,
-    trust_remote_code=True,
-    device_map="auto",
-)
-sequences = pipeline(
-   "generate a hard python question with 3 wrong answers, 1 correct answer, and explanations for each",
-    max_length=200,
-    do_sample=True,
-    top_k=10,
-    num_return_sequences=1,
-    eos_token_id=tokenizer.eos_token_id,
-)
-for seq in sequences:
-    print(f"Result: {seq['generated_text']}")
+def to_markdown(text):
+  text = text.replace('•', '  *')
+  return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
+
+to_markdown(response.text)
